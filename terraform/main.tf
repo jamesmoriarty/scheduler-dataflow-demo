@@ -13,7 +13,7 @@ provider "google" {
 # Use this data source to get project details. For more information see API.
 # https://www.terraform.io/docs/providers/google/d/google_project.html
 
-data "google_project" "project" {}
+data "google_project" "examples-249001" {}
 
 resource "google_cloud_scheduler_job" "scheduler" {
   name = "scheduler-demo"
