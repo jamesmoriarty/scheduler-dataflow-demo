@@ -1,4 +1,6 @@
 # The PROJECT_ID is a cloud build env variable
+options:
+  logging: CLOUD_LOGGING_ONLY
 steps:
 - id: 'Terraform init'
   name: 'hashicorp/terraform:0.12.20'
