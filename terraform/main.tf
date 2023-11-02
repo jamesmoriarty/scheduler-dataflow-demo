@@ -53,6 +53,16 @@ resource "google_service_account" "cloud-scheduler-demo" {
   display_name = "A service account for running dataflow from cloud scheduler"
 }
 
+# MISSING_ACTAS_PERMISSION: While creating this resource, the principal did not have the 
+# iam.serviceAccounts.actAs permission on the service account that is attached to the resource.
+# See https://cloud.google.com/iam/docs/service-accounts-actas for details and remediation 
+# steps.
+resource "google_project_iam_member" "cloud-scheduler-acts-as" {
+  project = var.project_id
+  role = "roles/iam.serviceAccountUser"
+  member = "serviceAccount:${google_service_account.cloud-scheduler-demo.email}"
+}
+
 resource "google_project_iam_member" "cloud-scheduler-dataflow" {
   project = var.project_id
   role = "roles/dataflow.admin"
