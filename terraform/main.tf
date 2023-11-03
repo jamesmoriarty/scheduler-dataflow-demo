@@ -69,6 +69,7 @@ resource "google_cloud_scheduler_job" "scheduler-dataflow" {
     {
       "configuration": {
         "jobType": "EXTRACT",
+        "dryRun": true,
         "extract": {
           "destinationFormat": "AVRO",
           "compression": "SNAPPY",
