@@ -64,9 +64,7 @@ public class DataflowDemoPipeline {
 
                         for (Table table : bigquery.listTables(options.getDatasetId().get(), BigQuery.TableListOption.pageSize(100)).iterateAll()) {
                             ExtractJobConfiguration extractJobConfiguration = ExtractJobConfiguration.newBuilder(table.getTableId(), options.getGCSUrl().get())
-                                .setCompression("SNAPPY")
-                                .setFormat("AVRO")
-                                .setUseAvroLogicalTypes(true)
+                                .setFormat("Avro") 
                                 .build();
 
                             // Create a job ID so that we can safely retry.
