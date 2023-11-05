@@ -4,8 +4,18 @@ import org.apache.beam.sdk.options.Description;
 import org.apache.beam.sdk.options.ValueProvider;
 
 public interface DemoPipelineOptions extends DataflowPipelineOptions {
-    // @Description("Subscription name")
-    // @Default.String("demo_subscription")
-    // ValueProvider<String> getSubscription();
-    // void setSubscription(ValueProvider<String> subscription);
+    @Description("ProjectId")
+    @Default.String("examples-249001")
+    ValueProvider<String> getProjectId();
+    void setProjectId(ValueProvider<String> projectId);
+
+    @Description("DatasetId")
+    @Default.String("Test")
+    ValueProvider<String> getDatasetId();
+    void setDatasetId(ValueProvider<String> datasetId);
+
+    @Description("GCS URL")
+    @Default.String("gs://examples-249001/tmp/backup-example2/")
+    ValueProvider<String> getGCSUrl();
+    void setGCSUrl(ValueProvider<String> gcsUrl);
 }
