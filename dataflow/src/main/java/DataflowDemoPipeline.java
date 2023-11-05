@@ -9,6 +9,9 @@ import org.apache.beam.sdk.values.PDone;
 import java.util.Arrays;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class DataflowDemoPipeline {
     private static final Logger Log = LoggerFactory.getLogger(DataflowDemoPipeline.class);
 
