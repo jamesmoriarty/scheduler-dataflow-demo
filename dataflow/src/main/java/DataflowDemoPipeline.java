@@ -66,6 +66,7 @@ public class DataflowDemoPipeline {
                             ExtractJobConfiguration extractJobConfiguration = ExtractJobConfiguration.newBuilder(table.getTableId(), options.getGCSUrl().get())
                                 .setCompression("SNAPPY")
                                 .setFormat("AVRO")
+                                .setUseAvroLogicalTypes(true)
                                 .build();
 
                             // Create a job ID so that we can safely retry.
