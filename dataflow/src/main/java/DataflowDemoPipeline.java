@@ -63,12 +63,15 @@ public class DataflowDemoPipeline {
                             .getService();
 
                         for (Table table : bigquery.listTables(options.getDatasetId().get(), BigQuery.TableListOption.pageSize(100)).iterateAll()) {
-                            ExtractJobConfiguration extractJobConfiguration = ExtractJobConfiguration.newBuilder(table.getTableId(), options.getGCSUrl().get())
-                                .setFormat("Avro") 
-                                .build();
+                            ExtractJobConfiguration extractJobConfiguration = ExtractJobConfiguration.newBuilder(
+                                table.getTableId(),
+                                options.getGCSUrl().get())
+                                    .setFormat("Avro") 
+                                    .build();
 
                             // Create a job ID so that we can safely retry.
                             JobId jobId = JobId.of(UUID.randomUUID().toString());
+
                             JobInfo jobInfo = JobInfo.newBuilder(extractJobConfiguration).setJobId(jobId).build();
                             Job job = bigquery.create(jobInfo);
     
