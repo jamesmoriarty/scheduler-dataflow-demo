@@ -15,7 +15,7 @@ public interface DemoPipelineOptions extends DataflowPipelineOptions {
     void setDatasetId(ValueProvider<String> datasetId);
 
     @Description("GCS URL")
-    @Default.String("gs://examples-249001/tmp/backup-example2/")
+    @Default.String("gs://examples-249001/tmp/backup-example3/")
     ValueProvider<String> getGCSUrl();
     void setGCSUrl(ValueProvider<String> gcsUrl);
 }

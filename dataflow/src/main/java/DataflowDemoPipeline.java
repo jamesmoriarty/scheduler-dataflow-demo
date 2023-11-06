@@ -6,9 +6,6 @@ import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PDone;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +15,9 @@ import java.util.UUID;
 import java.time.ZonedDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 public class DataflowDemoPipeline {
     private static final Logger Log = LoggerFactory.getLogger(DataflowDemoPipeline.class);
@@ -34,15 +33,7 @@ public class DataflowDemoPipeline {
 
         Pipeline p = Pipeline.create(options);
 
-        String time = ZonedDateTime          // Represent a moment as perceived in the wall-clock time used by the people of a particular region ( a time zone).
-            .now(                            // Capture the current moment.
-                ZoneId.of("UTC")             // Specify the time zone using proper Continent/Region name. Never use 3-4 character pseudo-zones such as PDT, EST, IST. 
-            )                                // Returns a `ZonedDateTime` object. 
-            .format(                         // Generate a `String` object containing text representing the value of our date-time object. 
-                DateTimeFormatter.ofPattern( "uuuu.MM.dd.HH.mm.ss" )
-            );                               // Returns a `String`. 
-
-        List<String> input = Arrays.asList(new String[]{time});
+        List<String> input = Arrays.asList(new String[]{getCurrentTimeString();});
 
         p.apply("Dummy Input", Create.of(input)).
             apply("Invoke Export", ParDo.of(
@@ -51,32 +42,15 @@ public class DataflowDemoPipeline {
                     public void processElement(ProcessContext context) {
                         String elem = context.element();
 
-                        Log.info("Time: " + elem);
-
                         DemoPipelineOptions options = context.getPipelineOptions()
                             .as(DemoPipelineOptions.class);
 
-                        // BigQuery bigquery = BigQueryOptions.getDefaultInstance().getService();
-                        BigQuery bigquery = BigQueryOptions.newBuilder()
-                            .setProjectId(options.getProjectId().get()) 
-                            .build()
-                            .getService();
+                        BigQuery bigquery = BigQueryOptions.getDefaultInstance().getService();
 
-                        for (Table table : bigquery.listTables(options.getDatasetId().get(), BigQuery.TableListOption.pageSize(100)).iterateAll()) {
-                            ExtractJobConfiguration extractJobConfiguration = ExtractJobConfiguration.newBuilder(
-                                table.getTableId(),
-                                options.getGCSUrl().get())
-                                    .setFormat("Avro") 
-                                    .build();
 
-                            // Create a job ID so that we can safely retry.
-                            JobId jobId = JobId.of(UUID.randomUUID().toString());
-
-                            JobInfo jobInfo = JobInfo.newBuilder(extractJobConfiguration).setJobId(jobId).build();
-                            Job job = bigquery.create(jobInfo);
-    
-                            Log.info("Export job " + jobInfo.getJobId() + " created");
-                        };
+                        for (Table table  : bigquery.listTables(options.getDatasetId().get()).iterateAll()) {
+                            extractTable(bigquery, table, options.getGCSUrl().get());
+                        }
 
                         context.output(elem);
                     }
@@ -85,7 +59,33 @@ public class DataflowDemoPipeline {
 
         PDone.in(p);
 
-        p.run();
+        p.run().waitUntilFinish();
+    }
+
+    private static String getCurrentTimeString() {
+        return ZonedDateTime                        // Represent a moment as perceived in the wall-clock time used by the people of a particular region ( a time zone).
+            .now(                            // Capture the current moment.
+                ZoneId.of("UTC")             // Specify the time zone using proper Continent/Region name. Never use 3-4 character pseudo-zones such as PDT, EST, IST. 
+            )                                // Returns a `ZonedDateTime` object. 
+            .format(                         // Generate a `String` object containing text representing the value of our date-time object. 
+                DateTimeFormatter.ofPattern( "uuuu.MM.dd.HH.mm.ss" )
+            );       
+    }
+
+    private static void extractTable(BigQuery bigquery, Table table, String gcsUrl) {
+        ExtractJobConfiguration extractJobConfiguration = ExtractJobConfiguration.newBuilder(
+            table.getTableId(),
+            gcsUrl)
+            .setFormat("Avro") 
+            .build();
+
+        // Create a job ID so that we can safely retry.
+        JobId jobId = JobId.of(UUID.randomUUID().toString());
+
+        JobInfo jobInfo = JobInfo.newBuilder(extractJobConfiguration).setJobId(jobId).build();
+        Job job = bigquery.create(jobInfo);
+
+        Log.info("Export job " + jobInfo.getJobId() + " created");
     }
 }
 
