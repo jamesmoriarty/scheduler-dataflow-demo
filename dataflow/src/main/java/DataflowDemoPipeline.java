@@ -23,8 +23,6 @@ public class DataflowDemoPipeline {
     private static final Logger Log = LoggerFactory.getLogger(DataflowDemoPipeline.class);
 
     public static void main(String[] args){
-     
-        // Register Options class for our pipeline with the factory
         PipelineOptionsFactory.register(DemoPipelineOptions.class);
 
         DemoPipelineOptions options = PipelineOptionsFactory.fromArgs(args)
@@ -63,7 +61,7 @@ public class DataflowDemoPipeline {
     }
 
     private static String getCurrentTimeString() {
-        return ZonedDateTime                        // Represent a moment as perceived in the wall-clock time used by the people of a particular region ( a time zone).
+        return ZonedDateTime                 // Represent a moment as perceived in the wall-clock time used by the people of a particular region ( a time zone).
             .now(                            // Capture the current moment.
                 ZoneId.of("UTC")             // Specify the time zone using proper Continent/Region name. Never use 3-4 character pseudo-zones such as PDT, EST, IST. 
             )                                // Returns a `ZonedDateTime` object. 
@@ -79,8 +77,7 @@ public class DataflowDemoPipeline {
             .setFormat("Avro") 
             .build();
 
-        // Create a job ID so that we can safely retry.
-        JobId jobId = JobId.of(UUID.randomUUID().toString());
+        JobId jobId = JobId.of(UUID.randomUUID().toString()); // Create a job ID so that we can safely retry.
 
         JobInfo jobInfo = JobInfo.newBuilder(extractJobConfiguration).setJobId(jobId).build();
         Job job = bigquery.create(jobInfo);
