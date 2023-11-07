@@ -60,7 +60,7 @@ public class DataflowDemoPipeline {
 
         p.run().waitUntilFinish();
 
-        // System.exit(0); // bugfix: opencenus threads https://pianshen.com/ask/83135710698/
+        System.exit(0); // bugfix: opencenus threads https://pianshen.com/ask/83135710698/
     }
 
     private static String getCurrentTimeString() {
