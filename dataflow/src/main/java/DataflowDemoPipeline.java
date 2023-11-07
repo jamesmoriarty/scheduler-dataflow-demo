@@ -58,7 +58,7 @@ public class DataflowDemoPipeline {
 
         PDone.in(p);
 
-        p.run().waitUntilFinish();
+        p.run(); // .waitUntilFinish(); // https://issues.apache.org/jira/browse/BEAM-9337
     }
 
     private static String getCurrentTimeString() {
