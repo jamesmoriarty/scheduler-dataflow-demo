@@ -11,13 +11,13 @@ import org.slf4j.LoggerFactory;
 
 import com.google.cloud.bigquery.*;
 
-import java.util.UUID;
 import java.time.ZonedDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import org.joda.time.Duration;
 
 public class DataflowDemoPipeline {
     private static final Logger Log = LoggerFactory.getLogger(DataflowDemoPipeline.class);
@@ -31,7 +31,7 @@ public class DataflowDemoPipeline {
 
         Pipeline p = Pipeline.create(options);
 
-        List<String> input = Arrays.asList(new String[]{getCurrentTimeString();});
+        List<String> input = Arrays.asList(new String[]{getCurrentTimeString()});
 
         p.apply("Dummy Input", Create.of(input)).
             apply("Invoke Export", ParDo.of(
@@ -45,7 +45,6 @@ public class DataflowDemoPipeline {
 
                         BigQuery bigquery = BigQueryOptions.getDefaultInstance().getService();
 
-
                         for (Table table  : bigquery.listTables(options.getDatasetId().get()).iterateAll()) {
                             extractTable(bigquery, table, options.getGCSUrl().get());
                         }
@@ -57,7 +56,9 @@ public class DataflowDemoPipeline {
 
         PDone.in(p);
 
-        p.run().waitUntilFinish();
+        p.run()
+
+        System.exit(0);
     }
 
     private static String getCurrentTimeString() {
