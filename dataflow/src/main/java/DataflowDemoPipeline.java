@@ -59,8 +59,6 @@ public class DataflowDemoPipeline {
         PDone.in(p);
 
         p.run().waitUntilFinish();
-
-        System.exit(0); // bugfix: opencenus threads https://pianshen.com/ask/83135710698/
     }
 
     private static String getCurrentTimeString() {

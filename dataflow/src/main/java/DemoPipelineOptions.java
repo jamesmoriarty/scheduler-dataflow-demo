@@ -10,7 +10,7 @@ public interface DemoPipelineOptions extends DataflowPipelineOptions {
     void setProjectId(ValueProvider<String> projectId);
 
     @Description("Kind")
-    @Default.String("BigQueryX")
+    @Default.String("BigQuery")
     ValueProvider<String> getKind();
     void setKind(ValueProvider<String> kind);
 

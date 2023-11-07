@@ -14,6 +14,8 @@
         <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
         <slf4j.version>1.7.25</slf4j.version>
         <jackson.version>2.8.8</jackson.version>
+
+        <exec.cleanupDaemonThreads>false</exec.cleanupDaemonThreads>
     </properties>
   
     <build>
