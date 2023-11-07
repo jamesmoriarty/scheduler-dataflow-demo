@@ -43,10 +43,12 @@ public class DataflowDemoPipeline {
                         DemoPipelineOptions options = context.getPipelineOptions()
                             .as(DemoPipelineOptions.class);
 
-                        BigQuery bigquery = BigQueryOptions.getDefaultInstance().getService();
-
-                        for (Table table  : bigquery.listTables(options.getDatasetId().get()).iterateAll()) {
-                            extractTable(bigquery, table, options.getGCSUrl().get());
+                        switch (options.getKind().get()) {
+                            case "BigQuery": bigQueryExtractTable(options) ;
+                                break;
+                            default:
+                                Log.error("Unsupported Kind " + options.getKind().get());
+                                System.exit(1);
                         }
 
                         context.output(elem);
@@ -58,7 +60,7 @@ public class DataflowDemoPipeline {
 
         p.run().waitUntilFinish();
 
-        System.exit(0); // bugfix: opencenus threads https://pianshen.com/ask/83135710698/
+        // System.exit(0); // bugfix: opencenus threads https://pianshen.com/ask/83135710698/
     }
 
     private static String getCurrentTimeString() {
@@ -71,7 +73,15 @@ public class DataflowDemoPipeline {
             );       
     }
 
-    private static void extractTable(BigQuery bigquery, Table table, String gcsUrl) {
+    private static void bigQueryExtractTable(DemoPipelineOptions options) {
+        BigQuery bigquery = BigQueryOptions.getDefaultInstance().getService();
+
+        for (Table table  : bigquery.listTables(options.getDatasetId().get()).iterateAll()) {
+            bigQueryExtractTable(bigquery, table, options.getGCSUrl().get());
+        }
+    }
+
+    private static void bigQueryExtractTable(BigQuery bigquery, Table table, String gcsUrl) {
         ExtractJobConfiguration extractJobConfiguration = ExtractJobConfiguration.newBuilder(
             table.getTableId(),
             gcsUrl)
@@ -79,7 +89,6 @@ public class DataflowDemoPipeline {
             .build();
 
         JobId jobId = JobId.of(UUID.randomUUID().toString()); // Create a job ID so that we can safely retry.
-
         JobInfo jobInfo = JobInfo.newBuilder(extractJobConfiguration).setJobId(jobId).build();
         Job job = bigquery.create(jobInfo);
 
