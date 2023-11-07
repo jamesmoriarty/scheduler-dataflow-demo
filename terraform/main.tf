@@ -48,47 +48,6 @@ EOT
   }
 }
 
-# https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/insert
-resource "google_cloud_scheduler_job" "scheduler-dataflow" {
-  name = "scheduler-dataflow"
-  schedule = "0 0 * * *"
-  # This needs to be us-central1 even if the app engine is in us-central.
-  # You will get a resource not found error if just using us-central.
-  region = "us-central1"
-
-  http_target {
-    http_method = "POST"
-    uri = "https://bigquery.googleapis.com/bigquery/v2/projects/${var.project_id}/jobs"
-    oauth_token {
-      service_account_email = google_service_account.cloud-scheduler-demo.email
-    }
-
-    # need to encode the string
-    # https://cloud.google.com/bigquery/docs/reference/rest/v2/Job
-    body = base64encode(<<-EOT
-    {
-      "configuration": {
-        "jobType": "EXTRACT",
-        "dryRun": true,
-        "extract": {
-          "destinationFormat": "AVRO",
-          "compression": "SNAPPY",
-          "destinationUris": [
-            "gs://examples-249001/tmp/backup-example2/*"
-          ],
-          "sourceTable": {
-            "datasetId": "Test",
-            "projectId": "${var.project_id}",
-            "tableId": "games_wide"
-          }
-        }
-      }
-    }
-EOT
-    )
-  }
-}
-
 resource "google_service_account" "cloud-scheduler-demo" {
   account_id = "scheduler-dataflow-demo"
   display_name = "A service account for running dataflow from cloud scheduler"
